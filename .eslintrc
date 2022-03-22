@@ -1,0 +1,7 @@
+{
+  "extends": "@antfu",
+  "rules": {
+    "comma-dangle": "off",
+    "@typescript-eslint/comma-dangle": "off"
+  }
+}
