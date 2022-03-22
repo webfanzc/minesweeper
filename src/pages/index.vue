@@ -32,12 +32,25 @@ const directions = [
   [0, 1],
 ]
 
+const blockColors = [
+  'text-transparent',
+  'text-green-500',
+  'text-blue-500',
+  'text-yellow-500',
+  'text-orange-500',
+  'text-red-500',
+  'text-purple-500',
+  'text-pink-500',
+  'text-teal-500'
+]
+
 function updateNumbers() {
   data.forEach((row, y) => {
     row.forEach((block, x) => {
-      if (block.mine)
+      if (block.mine || block.revealed)
         return
 
+      block.revealed = true
       directions.forEach(([dy, dx]) => {
         if (data[y + dy]?.[x + dx]?.mine)
           block.adjacentMines++
@@ -67,15 +80,13 @@ function generateMines() {
 function getBlockClass(block: BlockState) {
   const classes = []
 
+  if (!block.revealed)
+    classes.push('bg-gray-100')
+
   if (block.mine)
     classes.push('border-red')
-  if (block.adjacentMines >= 3)
-    classes.push('text-red')
-  else if (block.adjacentMines >= 2)
-    classes.push('text-yellow')
-  else if (block.adjacentMines >= 1)
-    classes.push('text-green')
-
+  else
+    classes.push(blockColors[block.adjacentMines] ?? blockColors.at(blockColors.length - 1))
   return classes.join(' ')
 }
 
@@ -102,6 +113,7 @@ function onButtonClick(block: BlockState) {
         h-10
         hover:bg-gray
         border
+        border-gray
         :class="getBlockClass(item)"
         @click="onButtonClick(item)"
       >
