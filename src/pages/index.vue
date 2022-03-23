@@ -22,7 +22,7 @@ const MINES_COUNT = 10
 const flaggedBlocks = ref<BlockState[]>([])
 const mineBlocks = ref<Pick<BlockState, 'x' | 'y'>[]>([])
 const gameState = ref(GameState.WAIT)
-let data = reactive(
+const data = reactive(
   generateData()
 )
 
@@ -48,11 +48,13 @@ const blockColors = [
   'text-pink-500',
   'text-teal-500'
 ]
+
 function restartGame() {
   flaggedBlocks.value = []
   mineBlocks.value = []
   gameState.value = GameState.WAIT
-  data = generateData()
+  data.length = 0
+  data.push(...generateData())
 }
 
 function generateData() {
@@ -82,6 +84,7 @@ function updateNumbers(block: BlockState) {
     if (data[block.y + dy]?.[block.x + dx]?.mine)
       block.adjacentMines++
   })
+
   if (block.adjacentMines === 0) {
     directions.forEach(([dy, dx]) => {
       const recurseBlock = data[block.y + dy]?.[block.x + dx]
@@ -157,15 +160,14 @@ function onButtonClick(block: BlockState) {
 </script>
 
 <template>
-  <div flex flex-col w-full>
+  <div flex flex-col w-full text-center justify-center items-center>
     <p>扫雷</p>
-    <p v-if="gameState === GameState.GAME_OVER" text-red>
-      游戏结束
-    </p>
-    <p v-if="gameState === GameState.WIN" text-green>
-      你成功了
-    </p>
-    <div flex flex-col justify-center items-center>
+    <div flex flex-col justify-center items-center w="400px">
+      <div text-left self-stretch>
+        <button border w-20 text-center my-2 @click="restartGame">
+          重新开始
+        </button>
+      </div>
       <div v-for="row, y in data" :key="y" flex>
         <button
           v-for="item, x in row"
@@ -193,6 +195,12 @@ function onButtonClick(block: BlockState) {
           }}
         </button>
       </div>
+      <p v-if="gameState === GameState.GAME_OVER" text-red>
+        游戏结束
+      </p>
+      <p v-if="gameState === GameState.WIN" text-green>
+        你成功了
+      </p>
     </div>
   </div>
 </template>
