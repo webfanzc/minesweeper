@@ -1,20 +1,7 @@
 <script setup lang="ts">
+import type { BlockState } from '~/types/index'
+import { GameState } from '~/types/index'
 
-interface BlockState {
-  x: number
-  y: number
-  revealed: boolean
-  mine: boolean
-  flagged: boolean
-  adjacentMines: number
-}
-enum GameState {
-  WAIT,
-  GAMING,
-  GAME_OVER,
-  WIN,
-  STOP
-}
 // const message
 const WIDTH = 10
 const HEIGHT = 10
@@ -23,7 +10,7 @@ const flaggedBlocks = ref<BlockState[]>([])
 const mineBlocks = ref<Pick<BlockState, 'x' | 'y'>[]>([])
 const gameState = ref(GameState.WAIT)
 const data = reactive(
-  generateData()
+  generateData(WIDTH, HEIGHT)
 )
 
 const directions = [
@@ -37,29 +24,17 @@ const directions = [
   [0, 1],
 ]
 
-const blockColors = [
-  'text-transparent',
-  'text-green-500',
-  'text-blue-500',
-  'text-yellow-500',
-  'text-orange-500',
-  'text-red-500',
-  'text-purple-500',
-  'text-pink-500',
-  'text-cyan-500'
-]
-
 function restartGame() {
   flaggedBlocks.value = []
   mineBlocks.value = []
   gameState.value = GameState.WAIT
   data.length = 0
-  data.push(...generateData())
+  data.push(...generateData(WIDTH, HEIGHT))
 }
 
-function generateData() {
-  return Array.from({ length: HEIGHT }, (_, y) =>
-    Array.from({ length: WIDTH },
+function generateData(width: number, height: number) {
+  return Array.from({ length: height }, (_, y) =>
+    Array.from({ length: width },
       (_, x): BlockState => ({ x, y, adjacentMines: 0, revealed: false, flagged: false, mine: false }),
     ),
   )
@@ -105,12 +80,12 @@ function setFlag(block: BlockState) {
   checkGameState()
 }
 
-function generateMines({ x: blockX, y: blockY }: BlockState) {
+function generateMines({ x: blockX, y: blockY }: BlockState, width: number, height: number) {
   const mines = []
 
   while (mines.length < MINES_COUNT) {
-    const x = Math.floor(Math.random() * WIDTH)
-    const y = Math.floor(Math.random() * HEIGHT)
+    const x = Math.floor(Math.random() * width)
+    const y = Math.floor(Math.random() * height)
 
     if (x === blockX && y === blockY)
       continue
@@ -122,22 +97,6 @@ function generateMines({ x: blockX, y: blockY }: BlockState) {
   }
 
   return mines
-}
-
-function getBlockClass(block: BlockState) {
-  const classes = []
-
-  if (!block.revealed)
-    classes.push('bg-gray-100')
-
-  if (block.mine && block.revealed)
-    classes.push('border-red bg-red-300/50')
-  else if (block.flagged)
-    classes.push('text-black')
-  else
-    classes.push(blockColors[block.adjacentMines] ?? blockColors.at(blockColors.length - 1))
-
-  return classes.join(' ')
 }
 
 function checkGameState() {
@@ -158,7 +117,7 @@ function checkGameState() {
 function onButtonClick(block: BlockState) {
   if (gameState.value === GameState.WAIT) {
     gameState.value = GameState.GAMING
-    mineBlocks.value.push(...generateMines(block))
+    mineBlocks.value.push(...generateMines(block, WIDTH, HEIGHT))
   }
 
   if (gameState.value !== GameState.GAMING)
@@ -196,31 +155,13 @@ function onButtonClick(block: BlockState) {
         <!-- <button border w-20 text-center my-2 @click="aiPlay">ai</button> -->
       </div>
       <div v-for="row, y in data" :key="y" flex>
-        <button
+        <MyBlock
           v-for="item, x in row"
           :key="x"
-          w-10
-          h-10
-          hover="bg-gray/20"
-          border="1 gray-400/20"
-          text-4
-          leading-none
-          :class="getBlockClass(item)"
+          :block="item"
           @click="onButtonClick(item)"
           @contextmenu.prevent="setFlag(item)"
-        >
-          {{
-            gameState !== GameState.WAIT ?
-              item.revealed || item.flagged ?
-                item.flagged ?
-                  '🚩' :
-                  item.mine ?
-                    '👹' :
-                    item.adjacentMines
-                : ''
-              : ''
-          }}
-        </button>
+        />
       </div>
       <p v-if="gameState === GameState.GAME_OVER" text-red>
         游戏结束
