@@ -46,7 +46,7 @@ const blockColors = [
   'text-red-500',
   'text-purple-500',
   'text-pink-500',
-  'text-teal-500'
+  'text-cyan-500'
 ]
 
 function restartGame() {
@@ -142,6 +142,7 @@ function getBlockClass(block: BlockState) {
     classes.push('text-black')
   else
     classes.push(blockColors[block.adjacentMines] ?? blockColors.at(blockColors.length - 1))
+
   return classes.join(' ')
 }
 
@@ -157,6 +158,21 @@ function onButtonClick(block: BlockState) {
   updateNumbers(block)
 }
 
+// function aiPlay() {
+//   if (gameState.value === GameState.WAIT) {
+//     const x = Math.floor(Math.random() * WIDTH)
+//     const y = Math.floor(Math.random() * HEIGHT)
+
+//     onButtonClick(data[y][x])
+//   }
+
+//   let unrevealedBlocks = data.map(row => row.filter(block => !block.revealed && !block.flagged)).flat(1)
+//   unrevealedBlocks.forEach(block => {
+//     dir
+//   })
+
+// }
+
 </script>
 
 <template>
@@ -164,9 +180,8 @@ function onButtonClick(block: BlockState) {
     <p>扫雷</p>
     <div flex flex-col justify-center items-center w="400px">
       <div text-left self-stretch>
-        <button border w-20 text-center my-2 @click="restartGame">
-          重新开始
-        </button>
+        <button border w-20 text-center my-2 mr-2 @click="restartGame">重新开始</button>
+        <!-- <button border w-20 text-center my-2 @click="aiPlay">ai</button> -->
       </div>
       <div v-for="row, y in data" :key="y" flex>
         <button
@@ -195,12 +210,8 @@ function onButtonClick(block: BlockState) {
           }}
         </button>
       </div>
-      <p v-if="gameState === GameState.GAME_OVER" text-red>
-        游戏结束
-      </p>
-      <p v-if="gameState === GameState.WIN" text-green>
-        你成功了
-      </p>
+      <p v-if="gameState === GameState.GAME_OVER" text-red>游戏结束</p>
+      <p v-if="gameState === GameState.WIN" text-green>你成功了</p>
     </div>
   </div>
 </template>
