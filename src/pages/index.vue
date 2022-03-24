@@ -102,13 +102,7 @@ function setFlag(block: BlockState) {
 
   block.flagged = !block.flagged
 
-  if (flaggedBlocks.value.length === MINES_COUNT) {
-    const isWin = mineBlocks.value.every(({ x, y }) => {
-      return flaggedBlocks.value.some(({ x: flaggedX, y: flaggedY }) => flaggedX === x && flaggedY === y)
-    })
-
-    isWin && (gameState.value = GameState.WIN)
-  }
+  checkGameState()
 }
 
 function generateMines({ x: blockX, y: blockY }: BlockState) {
@@ -146,6 +140,21 @@ function getBlockClass(block: BlockState) {
   return classes.join(' ')
 }
 
+function checkGameState() {
+  if (flaggedBlocks.value.length === MINES_COUNT) {
+    const isWin = mineBlocks.value.every(({ x, y }) => {
+      return data[y][x].mine
+    })
+
+    isWin && (gameState.value = GameState.WIN)
+  }
+
+  const unrevealedBlocks = data.flat(1).filter(block => !block.revealed)
+
+  if (unrevealedBlocks.length === 10 && unrevealedBlocks.every(block => block.mine))
+    gameState.value = GameState.WIN
+}
+
 function onButtonClick(block: BlockState) {
   if (gameState.value === GameState.WAIT) {
     gameState.value = GameState.GAMING
@@ -156,6 +165,7 @@ function onButtonClick(block: BlockState) {
     return
 
   updateNumbers(block)
+  checkGameState()
 }
 
 // function aiPlay() {
@@ -180,7 +190,9 @@ function onButtonClick(block: BlockState) {
     <p>扫雷</p>
     <div flex flex-col justify-center items-center w="400px">
       <div text-left self-stretch>
-        <button border w-20 text-center my-2 mr-2 @click="restartGame">重新开始</button>
+        <button border w-20 text-center my-2 mr-2 @click="restartGame">
+          重新开始
+        </button>
         <!-- <button border w-20 text-center my-2 @click="aiPlay">ai</button> -->
       </div>
       <div v-for="row, y in data" :key="y" flex>
@@ -210,8 +222,12 @@ function onButtonClick(block: BlockState) {
           }}
         </button>
       </div>
-      <p v-if="gameState === GameState.GAME_OVER" text-red>游戏结束</p>
-      <p v-if="gameState === GameState.WIN" text-green>你成功了</p>
+      <p v-if="gameState === GameState.GAME_OVER" text-red>
+        游戏结束
+      </p>
+      <p v-if="gameState === GameState.WIN" text-green>
+        你成功了
+      </p>
     </div>
   </div>
 </template>
