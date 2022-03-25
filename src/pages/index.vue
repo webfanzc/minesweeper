@@ -6,9 +6,9 @@ import { GameState } from '~/types/index'
 const WIDTH = 10
 const HEIGHT = 10
 const MINES_COUNT = 10
-const flaggedBlocks = ref<BlockState[]>([])
-const mineBlocks = ref<Pick<BlockState, 'x' | 'y'>[]>([])
-const gameState = ref(GameState.WAIT)
+let flaggedBlocks = $ref<BlockState[]>([])
+let mineBlocks = $ref<Pick<BlockState, 'x' | 'y'>[]>([])
+let gameState = $ref(GameState.WAIT)
 const data = reactive(
   generateData(WIDTH, HEIGHT)
 )
@@ -25,9 +25,9 @@ const directions = [
 ]
 
 function restartGame() {
-  flaggedBlocks.value = []
-  mineBlocks.value = []
-  gameState.value = GameState.WAIT
+  flaggedBlocks = []
+  mineBlocks = []
+  gameState = GameState.WAIT
   data.length = 0
   data.push(...generateData(WIDTH, HEIGHT))
 }
@@ -41,17 +41,17 @@ function generateData(width: number, height: number) {
 }
 
 function updateNumbers(block: BlockState) {
-  if (block.revealed || gameState.value === GameState.GAME_OVER || block.flagged)
+  if (block.revealed || gameState === GameState.GAME_OVER || block.flagged)
     return
 
   block.revealed = true
 
   if (block.mine) {
-    mineBlocks.value.forEach(({ x, y }) => {
+    mineBlocks.forEach(({ x, y }) => {
       data[y][x].revealed = true
     })
 
-    gameState.value = GameState.GAME_OVER
+    gameState = GameState.GAME_OVER
     return
   }
 
@@ -68,12 +68,12 @@ function updateNumbers(block: BlockState) {
   }
 }
 function setFlag(block: BlockState) {
-  if (gameState.value !== GameState.GAMING || block.revealed) return
+  if (gameState !== GameState.GAMING || block.revealed) return
 
   if (block.flagged)
-    flaggedBlocks.value = flaggedBlocks.value.filter(item => item !== block)
+    flaggedBlocks = flaggedBlocks.filter(item => item !== block)
   else
-    flaggedBlocks.value.push(block)
+    flaggedBlocks.push(block)
 
   block.flagged = !block.flagged
 
@@ -100,27 +100,27 @@ function generateMines({ x: blockX, y: blockY }: BlockState, width: number, heig
 }
 
 function checkGameState() {
-  if (flaggedBlocks.value.length === MINES_COUNT) {
-    const isWin = mineBlocks.value.every(({ x, y }) => {
+  if (flaggedBlocks.length === MINES_COUNT) {
+    const isWin = mineBlocks.every(({ x, y }) => {
       return data[y][x].mine
     })
 
-    isWin && (gameState.value = GameState.WIN)
+    isWin && (gameState = GameState.WIN)
   }
 
   const unrevealedBlocks = data.flat(1).filter(block => !block.revealed)
 
   if (unrevealedBlocks.length === 10 && unrevealedBlocks.every(block => block.mine))
-    gameState.value = GameState.WIN
+    gameState = GameState.WIN
 }
 
 function onButtonClick(block: BlockState) {
-  if (gameState.value === GameState.WAIT) {
-    gameState.value = GameState.GAMING
-    mineBlocks.value.push(...generateMines(block, WIDTH, HEIGHT))
+  if (gameState === GameState.WAIT) {
+    gameState = GameState.GAMING
+    mineBlocks.push(...generateMines(block, WIDTH, HEIGHT))
   }
 
-  if (gameState.value !== GameState.GAMING)
+  if (gameState !== GameState.GAMING)
     return
 
   updateNumbers(block)
@@ -128,7 +128,7 @@ function onButtonClick(block: BlockState) {
 }
 
 // function aiPlay() {
-//   if (gameState.value === GameState.WAIT) {
+//   if (gameState === GameState.WAIT) {
 //     const x = Math.floor(Math.random() * WIDTH)
 //     const y = Math.floor(Math.random() * HEIGHT)
 
