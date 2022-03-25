@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+function pow(num: number) {
+  return num ** 2
+}
+
 describe('tests', () => {
   it('should works', () => {
-    expect(1 + 1).toEqual(2)
+    expect(pow(4)).toMatchInlineSnapshot('16')
   })
 })

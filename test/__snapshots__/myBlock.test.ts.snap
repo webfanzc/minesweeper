@@ -1,0 +1,5 @@
+// Vitest Snapshot v1
+
+exports[`MyBlock.vue > should render > "" 1`] = `""`;
+
+exports[`MyBlock.vue > should render flag > "🚩" 1`] = `"🚩"`;

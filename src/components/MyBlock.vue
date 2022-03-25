@@ -26,7 +26,7 @@ function getBlockClass(block: BlockState) {
   else if (block.flagged)
     classes.push('text-black')
   else
-    classes.push(blockColors[block.adjacentMines] ?? blockColors.at(blockColors.length - 1))
+    classes.push(blockColors[block.adjacentMines] ?? blockColors[blockColors.length - 1])
 
   return classes.join(' ')
 }
