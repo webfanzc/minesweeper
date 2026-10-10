@@ -55,5 +55,25 @@
     "vite-ssg-sitemap": "^0.2.0",
     "vitest": "^0.7.0",
     "vue-tsc": "^0.33.2"
+  },
+  "pnpm": {
+    "overrides": {
+      "vue": "3.2.31",
+      "@vue/compiler-sfc": "3.2.31",
+      "@vue/compiler-dom": "3.2.31",
+      "@vue/server-renderer": "3.2.31",
+      "@vue/runtime-dom": "3.2.31",
+      "@vue/runtime-core": "3.2.31",
+      "@vue/reactivity": "3.2.31",
+      "@vue/shared": "3.2.31",
+      "@vitejs/plugin-vue": "2.2.4",
+      "vue-router": "4.0.14",
+      "vue-i18n": "9.1.9",
+      "vue-demi": "0.12.1",
+      "@intlify/core-base": "9.1.9",
+      "@intlify/shared": "9.1.9",
+      "@intlify/message-compiler": "9.1.9",
+      "pinia": "2.0.14"
+    }
   }
 }
